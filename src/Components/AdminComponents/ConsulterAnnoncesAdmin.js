@@ -13,7 +13,7 @@ const Statuts=[
     "Description":"Clotûrer"
   },
   {
-    "abr":"Accept",
+    "abr":"Accepter",
     "Description":"prise en charge"
   },
   {
