@@ -2,6 +2,8 @@ import React, { Component, useState } from 'react';
 import AnnonceService from '../../services/AnnonceService'
 import AnnonceCard from './AnnonceCard'
 import Carousel from 'react-bootstrap/Carousel'
+import { Redirect } from 'react-router-dom'
+
 // type_action :
 // cette composante sera utiliser dans 3 page a savoir (
 //   consulter vos annonce : type action=1 les actions sont :
@@ -39,6 +41,7 @@ class DetailAnnonce extends Component {
         status:""
      }
      ,
+     redirect:false,
      Images :[]
      
  }
@@ -75,7 +78,8 @@ class DetailAnnonce extends Component {
         AnnonceService.changeStatutAnnonce(this.state.Annonce.id,"AI")
     }
     AfficherDemandes(){
-
+    localStorage.setItem("idannonce",this.state.Annonce.id)
+    this.setState({redirect:true})
     }
     cloturer(){
       AnnonceService.changeStatutAnnonce(this.state.Annonce.id,"CL")
@@ -84,11 +88,13 @@ class DetailAnnonce extends Component {
       switch(this.state.type_action){
         case 1:
           return(
+            <div>
             <div className="row">
               <button className="btn btn-primary col-md-2 offset-md-1" onClick={()=>this.AfficherDemandes()} >Afficher les demmandes</button>
               <button className="btn btn-success col-md-2 offset-md-1" onClick={()=>this.cloturer()}>cloturer</button>
               <button className=" btn btn-danger col-md-2 offset-md-1" onClick={()=>this.AnnonceIllegale()} >anoonce illégale</button>
               <button className="btn btn-warning col-md-2 offset-md-1"  onClick={()=>this.Annuler()}>annuler</button>
+            </div>
             </div>
           )
         case 2:
@@ -134,6 +140,13 @@ class DetailAnnonce extends Component {
     if(this.state.closeDetail==0){
         return <AnnonceCard className="col-md-3" type_bien={this.state.type_bien} type_ops={this.state.type_operation} prix={this.state.Annonce.prix} 
         id_annonce={this.state.Annonce.id}/>
+    }
+    else if(this.state.redirect){
+      return  <Redirect
+      to={{
+      pathname: "/showDemands"
+    }}
+  />
     }
     else
     return (
@@ -219,6 +232,7 @@ class DetailAnnonce extends Component {
             {
               this.GetActions()
             }
+            
         </div>
     );
 }

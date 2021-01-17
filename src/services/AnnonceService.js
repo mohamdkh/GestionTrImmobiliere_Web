@@ -15,34 +15,37 @@ class AnnonceService{
            
         );
       }
-    SendData(Annonce,AllTypeBien,AllTypeOperation){
+    SendData(stateObject){
         let type_bien
         let type_ops
-        AllTypeBien.forEach(elem=>{
-            if(elem.type==Annonce.type_bien){
+        stateObject.AllTypeBien.forEach(elem=>{
+            if(elem.type==stateObject.Annonce.type_bien){
                 type_bien=elem.id
             }
         })
-        AllTypeOperation.forEach(elem=>{
-            if(elem.type==Annonce.type_operation){
+        stateObject.AllTypeOperation.forEach(elem=>{
+            if(elem.type==stateObject.Annonce.type_operation){
                 type_ops=elem.id
             }
         })
         const data={
-            "id":Annonce.id,
             "type_bien":type_bien,
             "type_operation":type_ops,
-            "surface":Annonce.surface,
-            "prix":Annonce.prix,
-            "description":Annonce.description,
-            "nom_complet_proprietaire":Annonce.nom_complet_proprietaire,
-            "telephone":Annonce.telephone,
-            "email":Annonce.email
+            "surface":stateObject.Annonce.surface,
+            "prix":stateObject.Annonce.prix,
+            "description":stateObject.Annonce.description,
+            "nom_complet_proprietaire":stateObject.Annonce.nom_complet_proprietaire,
+            "telephone":stateObject.Annonce.telephone,
+            "email":stateObject.Annonce.email,
+            "lon":stateObject.Annonce.lon,
+            "lat":stateObject.Annonce.lat
         }
         http.post("Annonce/PostData",JSON.stringify(data)).then(result=>{
-            if(result==true){
-                console.log("sucess")
-            }
+         if(result.data!=null){
+            stateObject.selectedFiles.map((item)=>{
+                this.UploadFile(item,result.data)
+            })
+         }
         })
       }
       GetAnnonces(id_intermmediaire){
@@ -144,8 +147,9 @@ class AnnonceService{
                 `,
                 type: 'warning',
                 showCancelButton: true,
+                cancelButtonText:'Annuler',
                 cancelButtonColor: 'grey',
-                confirmButtonText: 'Update!',
+                confirmButtonText: 'Envoyer',
                 allowOutsideClick: false,
                 preConfirm: () => {
                     nom= document.getElementById('nom').value
@@ -171,6 +175,37 @@ class AnnonceService{
                     
                 }
           })
+    }
+    GetDemandes(id){
+        return http.get("Annonce/getDemandes",{
+            params:{
+                idannonce:id
+            }
+        })
+    }
+    ValiderDemande(id){
+        Swal.fire({
+            title: 'Voulez-vous vraiment valider cette demande ?',
+            showDenyButton: true,
+            confirmButtonText: `Oui`,
+            denyButtonText: `Annuler`,
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                http.get("Annonce/ValiderDemande",{
+                    params:{
+                        iddeamande:id
+                    }
+                }).then(result=>{
+                    Swal.fire('Succession !', '', 'success')
+                })
+             
+            } 
+          })
+       
+    }
+    GetAllPictures(){
+        return http.get("Upload/GetPhotoBien");
     }
 }
 export default new AnnonceService();

@@ -4,6 +4,8 @@
 }
 body {
     background-image: none;
+    position: relative;
+    overflow: scroll;
 }
 html {
     height: 100%

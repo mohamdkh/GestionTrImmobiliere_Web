@@ -1,33 +1,33 @@
-import React, { Component } from 'react';
+import React, {useEffect, useState } from 'react';
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import '../Styles/Navbar.css'
 import logo from '../assets/Logo.png';
 import { Link } from 'react-router-dom';
 
 
-class Navbar extends Component {
-
-  state = {
-    username: localStorage.getItem("userName")!=null?localStorage.getItem("userName").toString():'',
-    UserExist: localStorage.getItem("userName")!=null?true:false,
-    roleLink:localStorage.getItem("role")!=null?localStorage.getItem("role").toString():""
-  }
-
-   constructor() {
-    super();
+function Navbar () {
+  const [username,setusername]=useState(localStorage.getItem("userName")!=null?localStorage.getItem("userName").toString():'')
+  const [UserExist,setUserExist]=useState(localStorage.getItem("userName")!=null?true:false)
+  const [roleLink,setroleLink]=useState(localStorage.getItem("role")!=null?localStorage.getItem("role").toString():"")
+  const [dropdownOpen, setOpen] = useState(false);
+  const toggle = () => setOpen(!dropdownOpen);
+  useEffect(()=>{
     if(localStorage.getItem("userName")!=null){
-       this.setState({ UserExist: true});
-       this.setState({ username: localStorage.getItem("userName").toString()});
-    }
-  }
-  LogOut = () => {
-    this.setState({ UserExist: false});
+
+      setroleLink(localStorage.getItem("role")!=null?localStorage.getItem("role").toString():"")
+      setUserExist(true)
+      setusername(localStorage.getItem("userName").toString())
+   }
+  },[])
+  
+  const LogOut = () => {
+    setUserExist(false)
     localStorage.clear();
     window.parent.location = "/login"
   }
-  render() {
     return (
       <>
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark" >
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark" style={{marginBottom:33}}>
           <a className="navbar-brand" href="#">
             <img src={logo} width="140" height="55" alt="" />
           </a>
@@ -37,13 +37,13 @@ class Navbar extends Component {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav mr-auto">
               <li className="nav-item">
-              <Link to="/Home">
+              <Link to="/Accueil">
                 <a className="nav-link" style={{ fontSize: '18px' }} ><i className="fa fa-home"></i> Accueil </a>
                 </Link>
               </li>
               <li className="nav-item">
-              <Link to="/OurOffers">
-                <a className="nav-link" style={{ fontSize: '18px' }} ><i className="fa fa-gift"></i> Nos offres</a>
+               <Link to="/Statistiques">
+                <a className="nav-link" style={{ fontSize: '18px' }} ><i class="fa fa-bar-chart" aria-hidden="true"></i> Statistiques</a>
                 </Link>
               </li>
               <li className="nav-item">
@@ -53,28 +53,64 @@ class Navbar extends Component {
               </li>
             </ul>
             {
-              this.state.UserExist ?
-                <div className="form-inline my-2 my-lg-0">
-                  <Link to={this.state.roleLink}>
-                  <button className={' btn btn-info '} type="button" style={{ marginRight: '5px' }} id="DesplayName">{this.state.username}</button>
-                  </Link>
-                  <button className=" btn btn-danger " type="button" id="LogOut" onClick={this.LogOut}>Déconnexion</button>
-                </div>
-                :
-                <div className="form-inline my-2 my-lg-0">
-                  <Link to="/Register">
-                    <button className="btn btn-primary" type="button"  style={{ marginRight: '5px' }} id="createAccount">
-                      Créer un compte</button>
-                  </Link>
-                  <Link to="/Login">
-                    <button className="btn btn-success" type="button"  id="Login">Se Connecter</button>
-                  </Link>
-                </div>
+               roleLink=='intermediaire'&&
+              <div className="form-inline my-2 my-lg-0">
+              <Link to={roleLink}>
+              <button className={' btn btn-info '} type="button" style={{ marginRight: '5px' }} id="DesplayName">{username}</button>
+              </Link>
+              <ButtonDropdown className="form-inline my-2 my-lg-0" isOpen={dropdownOpen} toggle={toggle}>
+              <DropdownToggle caret color="primary">
+                Espace Gestionnaire
+              </DropdownToggle>
+              <DropdownMenu>
+              <DropdownItem><Link to="/ProfilIntermmediaire">Mon Profil</Link></DropdownItem>
+                <DropdownItem><Link to="/AnnonceInterm">Mes Annonces</Link></DropdownItem>
+                <DropdownItem><Link to="/consultationInterm">Consulter les annonces</Link></DropdownItem>
+               <DropdownItem divider/>
+                <DropdownItem onClick={()=>LogOut()}> Déconnexion</DropdownItem>
+              </DropdownMenu>
+            </ButtonDropdown>
+              {/* <button className=" btn btn-danger " type="button" id="LogOut" onClick={()=>LogOut()}>Déconnexion</button> */}
+            </div>
+            }
+            {
+               roleLink=='admin'&&
+              <div className="form-inline my-2 my-lg-0">
+              <Link to={roleLink}>
+              <button className={' btn btn-info '} type="button" style={{ marginRight: '5px' }} id="DesplayName">{username}</button>
+              </Link>
+              <ButtonDropdown className="form-inline my-2 my-lg-0" isOpen={dropdownOpen} toggle={toggle}>
+              <DropdownToggle caret color="primary">
+                Espace Gestionnaire
+              </DropdownToggle>
+              <DropdownMenu>
+              <DropdownItem><Link to="/gestionAdhesion">Gérer les adhésions</Link></DropdownItem>
+                <DropdownItem><Link to="/gestionIntermmediaire">Gérer les intermmédiaire</Link></DropdownItem>
+                <DropdownItem><Link to="/ConsultationAdmin">Consulter les annonces</Link></DropdownItem>
+                <DropdownItem><Link to="/Messagerie">Boîte de réception</Link></DropdownItem>
+               <DropdownItem divider/>
+                <DropdownItem onClick={()=>LogOut()}> Déconnexion</DropdownItem>
+              </DropdownMenu>
+            </ButtonDropdown>
+              {/* <button className=" btn btn-danger " type="button" id="LogOut" onClick={()=>LogOut()}>Déconnexion</button> */}
+            </div>
+            }
+            
+            {
+              roleLink==''&&
+                <ButtonDropdown className="form-inline my-2 my-lg-0" isOpen={dropdownOpen} toggle={toggle}>
+                  <DropdownToggle caret color="primary">
+                    Espace Gestionnaire
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem><Link to="/Register">Créer un compte</Link></DropdownItem>
+                    <DropdownItem> <Link to="/Login">Se Connecter</Link></DropdownItem>
+                  </DropdownMenu>
+                </ButtonDropdown>
             }
           </div>
         </nav>
       </>
     )
   }
-}
 export default Navbar;

@@ -14,7 +14,8 @@ class ConbsulterAnnonceInterm extends Component {
     },
     Communes:{},
     type_bien:"",
-    type_ops:""
+    type_ops:"",
+    limite:0
   }
 
    constructor() {
@@ -31,6 +32,7 @@ class ConbsulterAnnonceInterm extends Component {
         AnnonceService.GetAnnonces(localStorage.getItem("id")).then((res3)=>{
             this.setState({Annonces:res3.data})
             this.setState({resultAnnonces:res3.data})
+            this.FetchData(1)
         })
     )
   }
@@ -84,6 +86,22 @@ changehandler=(e)=>{
   })
  }
 }
+
+FetchData(facteur){
+  if(this.state.resultAnnonces.length>(this.state.limite+facteur*8) && this.state.limite>=0){
+    this.setState({limite:this.state.limite+facteur*8})
+    this.setState({Annonces:[]})
+    let iterator=0;
+    this.state.resultAnnonces.map((item) =>{
+      if(iterator<this.state.limite && iterator>=(this.state.limite-8)){
+        this.setState(previousState => ({
+          Annonces: [...previousState.Annonces, item]
+      }))
+      }
+      iterator++
+    })
+  }
+  }
   render() {
     return (
       <>
@@ -122,8 +140,8 @@ changehandler=(e)=>{
                 
             </div>
             <div className="row">
-            <button className="col-md-2 offset-md-7 btn btn-primary">précédent</button>
-              <button className="col-md-2 offset-md-1 btn btn-primary">suivant </button>
+            <button className="col-md-2 offset-md-7 btn btn-primary" onClick={()=>this.FetchData(-1)}>précédent</button>
+              <button className="col-md-2 offset-md-1 btn btn-primary" onClick={()=>this.FetchData(1)}>suivant </button>
               
             </div>
           </div>

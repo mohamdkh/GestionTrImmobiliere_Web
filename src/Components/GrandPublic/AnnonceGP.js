@@ -3,7 +3,8 @@ import AnnonceService from '../../services/AnnonceService'
 import AnnonceCard from './../AnnonceComponent/AnnonceCard'
 import {Region} from '../../assets/var/RegionData'
 import CommuneService from './../../services/CommuneService'
-
+import Pagination from "react-js-pagination";
+import "./../../Styles/pagination.css"
 class AnnonceGP extends Component {
 
   state = {
@@ -11,35 +12,97 @@ class AnnonceGP extends Component {
     resultAnnonces:[],
     AllTypeBien:[],
     AllTypeOperation:[],
-    Filtre:{
         TypeOps:"",
-        Typelocation:"",
-        region:"",
+        typebien:"",
         commune:"",
-        statut:""
-        },
     Communes:{},
     type_bien:"",
     type_ops:"",
+    limite:1,
+    //pagination 
+    activePage: 1,
+    itemsCountPerPage:4,
+    totalItemsCount:0
     
   }
 
-   constructor() {
-    super();
+  handlePageChange(pageNumber) {
+    this.setState({activePage: pageNumber,
+    });
+    AnnonceService.GetAcceptsAnnonces().then((res3)=>{
+      this.setState({Annonces:res3.data.slice(this.state.itemsCountPerPage*(pageNumber-1),this.state.itemsCountPerPage*pageNumber)
+      })
+    })
+  }
+   constructor(props) {
+    super(props);
     AnnonceService.GetAllTypeBien().then((res1)=>{
-        this.setState({AllTypeBien:res1.data})
+        this.setState({AllTypeBien:res1.data
+        })
     }).then(
         AnnonceService.GetAllTypeOperation().then((res2)=>{
-            this.setState({AllTypeOperation:res2.data})
-           
-            
+            this.setState({AllTypeOperation:res2.data})    
         })
     ).then(
         AnnonceService.GetAcceptsAnnonces().then((res3)=>{
-            this.setState({Annonces:res3.data})
+            this.setState({Annonces:res3.data.slice(0,this.state.itemsCountPerPage),
+              totalItemsCount:res3.data.length
+            })
             this.setState({resultAnnonces:res3.data})
+            //this.FetchData(1)
+            this.FilterData(this.props.type_bien,this.props.TypeOps,this.props.commune)
         })
     )
+  }
+  FilterData(typebien,typeOps,commune){
+    let id=0;
+    if(typebien!=""){
+      this.state.AllTypeBien.map((item)=>{
+        console.log("je rentre")
+        if(item.type==typebien){
+          this.setState({Annonces:[]})
+          id=item.id
+          this.state.resultAnnonces.map((annonce)=>{
+            if(annonce.type_bien==id){
+              this.setState(previousState => ({
+                Annonces: [...previousState.Annonces, annonce]
+            }));
+            }
+          })
+        }
+      })
+    }
+    if(typeOps!=""){
+      this.state.AllTypeOperation.map((item)=>{
+        if(item.type==typeOps){
+          this.setState({Annonces:[]})
+          id=item.id
+          this.state.resultAnnonces.map((annonce)=>{
+            if(annonce.type_operation==id){
+              this.setState(previousState => ({
+                Annonces: [...previousState.Annonces, annonce]
+            }));
+            }
+          })
+        }
+      })
+    }
+    if(commune!=""){
+      Object.entries(this.state.Communes).map(([key, val]) => {
+        if (val == commune) {
+            this.setState({ Annonces: [] })
+            id = key;
+            this.state.resultAnnonces.map((annonce) => {
+                if (id == annonce.commune) {
+                    this.setState(previousState => ({
+                        Annonces: [...previousState.Annonces, annonce]
+                    }))  
+            }
+            })
+        }
+    })
+    }
+   
   }
   GetCommunes(value){
     let idRegion=0;
@@ -127,55 +190,24 @@ changehandler=(e)=>{
         })
 }
 }
+FetchData(facteur){
+  if(this.state.resultAnnonces.length>(this.state.limite+facteur*8) && this.state.limite>=0){
+    this.setState({limite:this.state.limite+facteur*8})
+    this.setState({Annonces:[]})
+    let iterator=0;
+    this.state.resultAnnonces.map((item) =>{
+      if(iterator<this.state.limite && iterator>=(this.state.limite-8)){
+        this.setState(previousState => ({
+          Annonces: [...previousState.Annonces, item]
+      }))
+      }
+      iterator++
+    })
+  }
+  }
   render() {
     return (
       <>
-         <div  className="form-group row SelectArea">
-             <div className="container">
-                 <div className="row">
-            <select className="form-control col-md-3" name="type_bien" title="type bien" id="type_bien"
-             onChange={this.changehandler}
-            >
-                <option selected="selected" value="" disabled>Type de bien</option>
-                {
-                this.state.AllTypeBien.map((item) =>
-                    <option>{item.type}</option>
-                    )
-                }
-            </select>
-            <select className="form-control col-md-3" name="type_ops" title="Type d'opération" id="type_ops"
-             onChange={this.changehandler}
-            >
-                <option selected="selected" disabled>Type d'opération</option>
-                {
-                this.state.AllTypeOperation.map((item) =>
-                    <option>{item.type}</option>
-                    )
-                }
-            </select>
-
-            <select className="form-control col-md-3 " name="region" title="Region" id="region"
-               aria-valuemax="" value={this.state.Filtre.region}  onChange={(e)=>this.GetCommunes(e.target.value)}>
-                <option selected disabled>Région</option>
-                {
-                Region.map((item) =>
-                    <option>{item.label}</option>
-                    )
-                }
-            </select>
-            <select className="form-control col-md-3" name="commune" id="commune" title="Commune"
-             onChange={this.changehandler}
-            >
-                <option selected disabled>Commune</option>
-              {
-                 Object.entries(this.state.Communes).map( ([key, value]) => 
-              <option >{value}</option>
-                 )
-              }
-            </select>
-            </div>
-            </div>
-        </div>
         <div className="py-5">
           <div className="container">
             <div className="row">
@@ -189,9 +221,13 @@ changehandler=(e)=>{
                 
             </div>
             <div className="row">
-            <button className="col-md-2 offset-md-7 btn btn-primary">précédent</button>
-              <button className="col-md-2 offset-md-1 btn btn-primary">suivant </button>
-              
+            <Pagination
+          activePage={this.state.activePage}
+          itemsCountPerPage={this.state.itemsCountPerPage}
+          totalItemsCount={this.state.totalItemsCount}
+          pageRangeDisplayed={5}
+          onChange={this.handlePageChange.bind(this)}
+        />
             </div>
           </div>
 

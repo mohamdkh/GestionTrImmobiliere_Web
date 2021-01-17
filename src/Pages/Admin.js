@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import '../Styles/Sidebar.css'
 import $ from 'jquery';
 import TableAdhesion from '../Components/AdminComponents/table-adhesions'
 import TableIntermmediaire from '../Components/AdminComponents/table-intermmediaire'
 import TableMessages from '../Components/AdminComponents/table-messages'
 import ConsulterAnnonceAdmin from '../Components/AdminComponents/ConsulterAnnoncesAdmin';
-
+import '../Styles/Sidebar.css'
 class Admin extends Component {
 
   state = {
