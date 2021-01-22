@@ -19,6 +19,14 @@ class Statistique2 extends Component {
       this.setState({data:result.data.liststatistiques,
         chartData:{
           labels:this.chartLabels,
+          options:{
+            plugins: {
+              datalabels: {
+                 display: true,
+              }
+           }
+          }
+          ,
           datasets:[
             {
               label:result.data[0].type,

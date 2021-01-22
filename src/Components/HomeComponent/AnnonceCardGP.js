@@ -1,20 +1,28 @@
 import { red } from '@material-ui/core/colors';
-import React, { Component ,useEffect,useState} from 'react';
+import React, { Component ,useState} from 'react';
 import { Link } from 'react-router';
 import styled from "styled-components";
-import DetailAnnonce from './DetailAnnonce';
-const AnnonceCard = (props)=> {
+import logo from './../../assets/imageTypeBien/maison.png';
+import DetailAnnonceGP from './DetailAnnonceGP';
+import {FilterContext} from './../../context/contexte'
+
+const AnnonceCardGP = (props)=> {
+    const context = React.useContext(FilterContext);
   const [showButton, showAndHide] = useState(0);
-  useEffect(()=>{
-    console.log(props)
-  },[])
   const OnClickDetail=(id)=>{
     showAndHide(1)
   }
   const getbackground=()=>{
   }
    if(showButton==1){
-    return <DetailAnnonce image={props.image} status={props.status} id={props.id_annonce} type_bien={props.type_bien} type_action={props.type_action} type_ops={props.type_ops}/>
+    context.setvisibleDetail({
+        id:props.id_annonce,
+        type_bien:props.type_bien,
+        type_operation:props.type_ops
+    })
+    return(
+        <div>Hello</div>
+    )
    }
    else
         return (
@@ -28,10 +36,11 @@ const AnnonceCard = (props)=> {
                             className="img-container p-5"
                         >
                             <Link to="/details">
-                              <img src={`data:image/jpeg;base64,${props.image}`} 
-                              width="400px" height="130px" 
-                              className="card-img-top" 
-                              />
+                            <img src={`data:image/jpeg;base64,${context.FindPhotos(props.id_annonce)}`} 
+                            width="400px" height="130px" 
+                            className="card-img-top" 
+                            />
+                                
                             </Link>
                             <button
                                 className="card-btn"
@@ -42,10 +51,10 @@ const AnnonceCard = (props)=> {
                             </button>
                         </div>
                         <div className="card-footer d-flex justify-content-between">
-                         <p className="align-self-center mb-0">{props.type_bien}<br/>{ props.type_ops}</p><br/>
+                         <p className="align-self-center mb-0">{context.getTypeBien(props.type_bien)}<br/>{context.getTypeOperation(props.type_ops)}</p><br/>
                          
                             <h5 className="text-blue font-italic mb-0">
-                                <span className="mr-1">{props.prix} DH</span>
+                                <span className="mr-1"><b>{props.prix} DH</b></span>
                             </h5>
                             
                         </div>
@@ -111,4 +120,4 @@ const AnnonceWrapper = styled.div`
     cursor: pointer;
   }
 `;
-export default AnnonceCard;
+export default AnnonceCardGP;

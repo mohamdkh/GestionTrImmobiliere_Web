@@ -4,6 +4,7 @@ import Profile from './../Components/intermediaryComponents/Profile'
 import Annonces from './../Components/AnnonceComponent/Annonces'
 import ConbsulterAnnonceInterm from './../Components/AnnonceComponent/ConsulterAnnonceIntermediaire'
 import ConsulterVosAnnonceInterm from '../Components/AnnonceComponent/ConsulterVosAnnonces';
+import Consultation from '../Components/AnnonceComponent/Consultation';
 class intermediary extends Component {
     state = {
         selectedbloc: 1
@@ -58,11 +59,8 @@ class intermediary extends Component {
               </button>
             </div>
             <ul class="list-unstyled components mb-5">
-              <li class="active" id='bloc1'>
-                <a href="#" onClick={()=>this.ActivateBloc(1)}>Profil </a>
-              </li>
               <li id='bloc2'>
-                <a href="#"  onClick={()=>this.ActivateBloc(2)}>Vos annonces</a>
+                <a href="#"  onClick={()=>this.ActivateBloc(2)}>Mes annonces</a>
               </li>
               <li id='bloc3'>
                 <a href="#" onClick={()=>this.ActivateBloc(3)}> Consulter les annonces</a>

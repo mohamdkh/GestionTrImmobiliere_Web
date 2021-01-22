@@ -9,6 +9,7 @@ import StyledButton from '../../Components/ContactUS-components/Button'
 import Input from '../../Components/ContactUS-components/Input'
 import Textarea from '../../Components/ContactUS-components/Textarea'
 import Discussion from '../../services/DiscussionService'
+import Swal from 'sweetalert2'
 
 const WrapperGrid = styled.div`
     ${props => props.full && css`
@@ -33,6 +34,19 @@ class ContactForm extends React.Component{
     }
     SendMail(){
         Discussion.SendEmail(this.state.nom,this.state.email,this.state.tel,this.state.message)
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Le message a été bien envoyé',
+            showConfirmButton: true,
+          }).then(
+              result=>{
+                  if(result.isConfirmed){
+                    window.parent.location ="/Accueil"
+                  }
+              }
+          
+          )
     }
     render() {
         return (

@@ -9,7 +9,7 @@ export default class AfficherDemande extends Component{
     constructor(props){
         super();
         // this.setState({id:props.id_annonce})
-        AnnonceService.GetDemandes(parseInt(localStorage.getItem("idannonce"))).then((result)=>{
+        AnnonceService.GetDemandes(parseInt(props.id_annonce)).then((result)=>{
             console.log(result)
             this.setState({Data:result.data})
         })
@@ -18,7 +18,7 @@ export default class AfficherDemande extends Component{
         AnnonceService.ValiderDemande(id)
     }
     Retour(){
-        window.location.href="/intermediaire#"
+        localStorage.setItem("retour",true)
     }
     render(){
         return(
@@ -40,15 +40,12 @@ export default class AfficherDemande extends Component{
                                                 <td class="col-2 col-md-2 text-center">{item.email}</td>
                                                 <td class="col-4 col-md-3 text-center">{item.tel} </td>
                                                 <td class="col-4 col-md-3 text-center">{item.date}</td>
-                                                <td class="col-2 col-md-2 text-center"><button className="btn btn-primary" onClick={()=>this.ValiderDemande(item.id)} disabled={item.status=="en cours"?false:true}>valider</button> </td>
+                                                <td class="col-2 col-md-2 text-center"><button className="btn btn-primary" onClick={()=>this.ValiderDemande(item.id)} disabled={item.status=="en cours"?false:true}>demande Traitée</button> </td>
                                                 </tr>
                                             )
                                                 }
                                               </tbody>
               </table>
-              <div className="row">
-              <button className="offset-md-4 col-md-3 btn btn-success" onClick={()=>this.Retour()}>Retour </button>
-              </div>
               
               </div>
             </>

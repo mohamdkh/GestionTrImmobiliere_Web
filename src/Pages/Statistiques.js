@@ -36,8 +36,12 @@ class Statistiques extends Component {
               )
       case 5:
                 return(
-                  <Statistique5></Statistique5>
+                  <Statistique5 cat="typebien"></Statistique5>
                 )
+     case 6:
+                  return(
+                    <Statistique5 cat="typeops"></Statistique5>
+                  )
     }
   }
   render() {
@@ -88,7 +92,15 @@ class Statistiques extends Component {
                   onClick={()=>this.SelectStatistique(5)}
                   />
                   <span className="radio"></span>
-                  <span className="label">des annonces par catégorie </span>
+                  <span className="label">des annonces par type de bien: </span>
+                </label>
+                <label>
+                  <input type="radio" name="options"  className="inputRadio"
+                  value="demandesMensuel"
+                  onClick={()=>this.SelectStatistique(6)}
+                  />
+                  <span className="radio"></span>
+                  <span className="label">des annonces par type d'opération </span>
                 </label>
               </div>
               

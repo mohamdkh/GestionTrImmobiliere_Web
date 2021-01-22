@@ -38,6 +38,7 @@ export default class Profile extends Component {
         Swal.fire({
             title: 'Saisir le mot de passe',
             input: 'text',
+            inputValue:this.state.displaypassword,
             inputAttributes: {
               autocapitalize: 'off'
             },
@@ -124,7 +125,7 @@ export default class Profile extends Component {
                                             <h5>Mot de passe :</h5>
                                         </div>
                                         <div className="text scrollablediv"  >
-                                         <div className="row offset-md-1"> {this.state.displaypassword}</div>
+                                         <div className="row offset-md-1"> *************</div>
                                          <button className="btn btn-danger row offset-md-5" onClick={()=>this.ChangePassword()}>Changer le mot de passe</button>
                                          </div>
                                        

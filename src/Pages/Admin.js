@@ -6,10 +6,11 @@ import TableIntermmediaire from '../Components/AdminComponents/table-intermmedia
 import TableMessages from '../Components/AdminComponents/table-messages'
 import ConsulterAnnonceAdmin from '../Components/AdminComponents/ConsulterAnnoncesAdmin';
 import '../Styles/Sidebar.css'
+// import Consultation from '../Components/AdminComponents/Consultation';
 class Admin extends Component {
 
   state = {
-    selectedbloc: 1
+    selectedbloc: 4
   }
   constructor() {
     super();
@@ -24,13 +25,13 @@ class Admin extends Component {
         return ([
           <TableIntermmediaire/>
         ])
-      case 4:
+      case 3 :
         return([
-          <TableMessages/>
+          <ConsulterAnnonceAdmin/>
         ])
       default:
         return ([
-          <ConsulterAnnonceAdmin/>
+          <TableMessages/>
         ])
     }
   }
@@ -56,7 +57,7 @@ class Admin extends Component {
               </button>
             </div>
             <ul class="list-unstyled components mb-5">
-              <li class="active" id='bloc1'>
+              <li class="" id='bloc1'>
                 <a href="#" onClick={()=>this.ActivateBloc(1)}>Gérer les adhésions </a>
               </li>
               <li id='bloc2'>
@@ -65,9 +66,7 @@ class Admin extends Component {
               <li id='bloc3'>
                 <a href="#" onClick={()=>this.ActivateBloc(3)}> Consulter les annonces</a>
               </li>
-              <li id='bloc4'>
-                <a href="#" onClick={()=>this.ActivateBloc(4)}>Boîte de réception</a>
-              </li>
+             
             </ul>
 
           </nav>

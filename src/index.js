@@ -8,7 +8,6 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Register from './Pages/Register';
 import Login from './Pages/Login'
 import Navbar from './Components/Navbar'
-import Home from './Pages/Home'
 import Admin from './Pages/Admin'
 import OurOffers from './Pages/OurOffers'
 import ContactForm from './Pages/Contact-us/ContactForm'
@@ -18,7 +17,6 @@ import ProgressBarAnnonce from './Components/Add-Annonce/ProgressBarAnnonce';
 import DetailAnnonce from './Components/AnnonceComponent/DetailAnnonce';
 import AfficherDemande from './Components/AnnonceComponent/AfficherDemandes';
 import Statistiques from './Pages/Statistiques';
-import HomePage from './Pages/HomePage';
 import Profile from './Components/intermediaryComponents/Profile';
 import ConsulterVosAnnonceInterm from './Components/AnnonceComponent/ConsulterVosAnnonces';
 import ConbsulterAnnonceInterm from './Components/AnnonceComponent/ConsulterAnnonceIntermediaire';
@@ -26,7 +24,8 @@ import TableAdhesion from './Components/AdminComponents/table-adhesions';
 import TableIntermmediaire from './Components/AdminComponents/table-intermmediaire';
 import ConsulterAnnonceAdmin from './Components/AdminComponents/ConsulterAnnoncesAdmin';
 import TableMessages from './Components/AdminComponents/table-messages';
-import MapTest from './Pages/MapTest';
+import HomePage from './Pages/HomePage';
+import About from './Pages/About';
 
 ReactDOM.render(
   <><div className="App">
@@ -34,7 +33,6 @@ ReactDOM.render(
         <Navbar />
         <Switch>
           <Route path='/' exact component={Login} />
-          <Route path='/Home' component={Home} />
           <Route path='/Contact' component={ContactForm} />
           <Route path='/Admin' component={Admin} />
           <Route path='/intermediaire' component={intermediary} />
@@ -52,7 +50,7 @@ ReactDOM.render(
           <Route path='/showDemands' component={AfficherDemande} />
           <Route path='/Statistiques' component={Statistiques} />
           <Route path='/Accueil'  component={HomePage}/>
-          <Route path='/mapTest'  component={MapTest}/>
+          <Route path='/About'  component={About}/>
 
         </Switch>
       </Router>

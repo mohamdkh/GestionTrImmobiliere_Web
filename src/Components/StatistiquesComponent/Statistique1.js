@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import {Bar, Line, Pie} from 'react-chartjs-2';
 import StatistiqueService from './../../services/StatistiqueService'
 import AnnonceService from '../../services/AnnonceService'
+import 'chart.piecelabel.js';
 class Statistique1 extends Component {
   state={
     data:[],
@@ -10,7 +11,11 @@ class Statistique1 extends Component {
     AllTypeBien:[],
     AllTypeOperation:[],
     type_bien:"",
-    type_ops:""
+    type_ops:"",
+    datalabels: {
+      display: true,
+      color: 'white'
+   }
   }
   constructor(){
     super()
@@ -105,6 +110,9 @@ class Statistique1 extends Component {
         </div>
         <div className="row chart">
            <Line
+           plugins={
+            this.state.datalabels
+           }
           data={this.state.chartData}
         />
         </div>

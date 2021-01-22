@@ -4,13 +4,14 @@ import AnnonceCard from './AnnonceCard'
 import { Region } from '../../assets/var/RegionData'
 import Pagination from "react-js-pagination";
 import $ from 'jquery';
-function ConsulterVosAnnonceInterm(){
+function Consultation(){
     const [AllAnnonces, setAllAnnonces]=React.useState([])
     const [Annonces, setAnnonces]=React.useState([])
     const [PhotoRepresentatifs, setPhotoRepresentatifs]=React.useState([])
     const [resultAnnonces, setresultAnnonces]=React.useState([])
     const [AllTypeBien, setAllTypeBien]=React.useState([])
     const [AllTypeOperation, setAllTypeOperation]=React.useState([])
+    const [Communes, setCommunes]=React.useState({})
     const [pagination, setpagination]=React.useState({
         activePage: 1,
         itemsCountPerPage: 8,
@@ -76,21 +77,24 @@ const getTypeBien=(id_type)=> {
   const changehandler = (e) => {
     setIsFilter(true)
     let result=[]
+    console.log(resultAnnonces.length)
     const { name, value } = e.target
     let id = 0;
     if (name == "type_bien") {
-        setresultAnnonces(resultAnnonces.filter(annonce => annonce.type_bien == value ))
+        setresultAnnonces([])
+        setresultAnnonces(AllAnnonces.filter(annonce => annonce.type_bien == value ))
     }
     else if (name == "type_ops") {
-        setresultAnnonces(resultAnnonces.filter(annonce => annonce.type_operation == value ))
+        setresultAnnonces([])
+        setresultAnnonces(AllAnnonces.filter(annonce => annonce.type_operation == value ))
       }
       else if (name == "commune") {
         setresultAnnonces([])
-        setresultAnnonces(resultAnnonces.filter(annonce => annonce.commune == value ))
+        setresultAnnonces(AllAnnonces.filter(annonce => annonce.commune == value ))
       }
       else if (name == "statut") {
         setresultAnnonces([])
-        setresultAnnonces(resultAnnonces.filter(annonce => annonce.status == value ))
+        setresultAnnonces(AllAnnonces.filter(annonce => annonce.status == value ))
       }
     setpagination({
         ...pagination,
@@ -122,7 +126,7 @@ const getTypeBien=(id_type)=> {
             }
           </select>
           <select className="form-control col-md-3" name="type_ops" title="Type d'opération" id="type_ops"
-            onChange={changehandler}
+            // onChange={this.changehandler}
           >
             <option selected="selected" value="0" disabled>Type d'opération</option>
             {
@@ -150,7 +154,7 @@ const getTypeBien=(id_type)=> {
               {
                 Annonces.map((item) =>
                   <AnnonceCard className="col-md-3" type_bien={getTypeBien(item.type_bien)} type_ops={getTypeOperation(item.type_operation)} prix={item.prix}
-                    id_annonce={item.id} image={FindPhotos(item.id)} type_action={1} status={item.status} />
+                    id_annonce={item.id} image={FindPhotos(item.id)} type_action={3} status={item.status} />
                 )
 
               }
@@ -171,4 +175,4 @@ const getTypeBien=(id_type)=> {
       </>
     )
 }
-export default ConsulterVosAnnonceInterm;
+export default Consultation;

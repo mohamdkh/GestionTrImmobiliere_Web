@@ -1,259 +1,236 @@
-import React, { Component } from 'react';
+import React from 'react';
 import AnnonceService from '../../services/AnnonceService'
 import AnnonceCard from './../AnnonceComponent/AnnonceCard'
-import {Region} from '../../assets/var/RegionData'
+import { Region } from '../../assets/var/RegionData'
 import CommuneService from './../../services/CommuneService'
-const Statuts=[
-  {
-    "abr":"NV",
-    "Description":"Non validée"
-  },
-  {
-    "abr":"CL",
-    "Description":"Clotûrer"
-  },
-  {
-    "abr":"Accepter",
-    "Description":"prise en charge"
-  },
-  {
-    "abr":"AI",
-    "Description":"illégale"
-  },
-]
-class ConsulterAnnonceAdmin extends Component {
-
-  state = {
-    Annonces:[],
-    resultAnnonces:[],
-    AllTypeBien:[],
-    AllTypeOperation:[],
-    Filtre:{
-        TypeOps:"",
-        Typelocation:"",
-        region:"",
-        commune:"",
-        statut:""
-        },
-    Communes:{},
-    type_bien:"",
-    type_ops:"",
-    limite:0
-    
-  }
-
-   constructor() {
-    super();
-    AnnonceService.GetAllTypeBien().then((res1)=>{
-        this.setState({AllTypeBien:res1.data})
-    }).then(
-        AnnonceService.GetAllTypeOperation().then((res2)=>{
-            this.setState({AllTypeOperation:res2.data})
-           
-            
-        })
-    ).then(
-        AnnonceService.GetAllAnnonces().then((res3)=>{
-            this.setState({Annonces:res3.data})
-            this.setState({resultAnnonces:res3.data})
-            this.FetchData(1)
-        })
-    )
-  }
-  GetCommunes(value){
-    let idRegion=0;
-    Region.forEach(region=>{
-        if(region.label==value){
-            idRegion=region.id
-        }
+import Pagination from "react-js-pagination";
+import $ from 'jquery';
+const Statuts = [
+    {
+      "abr": "NV",
+      "Description": "Non validée"
+    },
+    {
+      "abr": "CL",
+      "Description": "Clotûrer"
+    },
+    {
+      "abr": "Accept",
+      "Description": "prise en charge"
+    },
+    {
+      "abr": "AI",
+      "Description": "illégale"
+    },
+  ]
+function ConsulterAnnoncesAdmin(){
+    const [AllAnnonces, setAllAnnonces]=React.useState([])
+    const [Annonces, setAnnonces]=React.useState([])
+    const [PhotoRepresentatifs, setPhotoRepresentatifs]=React.useState([])
+    const [resultAnnonces, setresultAnnonces]=React.useState([])
+    const [AllTypeBien, setAllTypeBien]=React.useState([])
+    const [AllTypeOperation, setAllTypeOperation]=React.useState([])
+    const [Communes, setCommunes]=React.useState({})
+    const [pagination, setpagination]=React.useState({
+        activePage: 1,
+        itemsCountPerPage: 8,
+        totalItemsCount: 0
     })
-
-    CommuneService.GetCommune(idRegion.toString()).then(response => {
-        response.data.forEach(element => {
-            let tab = element.split(";");
-            this.state.Communes[tab[0]] = tab[1];
-        });
-        
+    const [isfilter,setIsFilter]=React.useState(false)
+    React.useEffect(()=>{
+      setAnnonces(resultAnnonces.slice(0,pagination.itemsCountPerPage))
+      setpagination({
+        ...pagination,
+        totalItemsCount: resultAnnonces.length
     })
-    this.setState({Filtre:{
-                    region:value
-                }})
-     
-    
-  }
-  getTypeBien(id_type){
-      let type_bien=""
-    this.state.AllTypeBien.map((item) =>{
-        if(item.id==id_type)
-        type_bien= item.type
+    },[resultAnnonces])
+React.useEffect(()=>{
+    AnnonceService.GetAllTypeBien().then((res1) => {
+        setAllTypeBien(res1.data)
+      }).then(
+        AnnonceService.GetAllTypeOperation().then((res2) => {
+            setAllTypeOperation(res2.data)
+        })
+      ).then(
+        AnnonceService.GetAllAnnonces().then((res3) => {
+            setAllAnnonces(res3.data)
+            setAnnonces(res3.data.slice(0, pagination.itemsCountPerPage))
+            setresultAnnonces(res3.data)
+            setpagination({
+                ...pagination,
+                totalItemsCount: res3.data.length
+            })
+        })
+      ).then(
+        AnnonceService.GetAllPictures().then((pictures) => {
+         setPhotoRepresentatifs(pictures.data)
+        })
+      )
+},[])
+
+const getTypeBien=(id_type)=> {
+    let type_bien = ""
+   AllTypeBien.map((item) => {
+      if (item.id == id_type)
+        type_bien = item.type
     })
     return type_bien;
   }
-  getTypeOperation(id_type){
-    let type_Operation=""
-  this.state.AllTypeOperation.map((item) =>{
-      if(item.id==id_type)
-      type_Operation= item.type
-  })
-  return type_Operation;
-}
-changehandler=(e)=>{
-  const {name, value} = e.target
-  let id=0;
- if(name=="type_bien"){
-  this.state.AllTypeBien.map((item)=>{
-    if(item.type==value){
-      this.setState({Annonces:[]})
-      id=item.id
-      this.state.resultAnnonces.map((annonce)=>{
-        if(annonce.type_bien==id){
-          this.setState(previousState => ({
-            Annonces: [...previousState.Annonces, annonce]
-        }));
-        }
+  const  getTypeOperation=(id_type)=> {
+    let type_Operation = ""
+   AllTypeOperation.map((item) => {
+      if (item.id == id_type)
+        type_Operation = item.type
+    })
+    return type_Operation;
+  }
+  const FindPhotos=(id_annonce)=> {
+    let foundElements = PhotoRepresentatifs.filter(photo => photo.id_annonce == id_annonce)
+    if (foundElements.length != 0) {
+      return foundElements[0].image
+    }
+  }
+  const handlePageChange=(pageNumber)=> {
+      setpagination({
+          ...pagination,
+          activePage: pageNumber,
       })
+      setAnnonces(resultAnnonces.slice(pagination.itemsCountPerPage * (pageNumber - 1), pagination.itemsCountPerPage * pageNumber))
+  }
+ const GetCommunes=(value) =>{
+    let Communelist={}
+    CommuneService.GetCommune(value.toString()).then(response => {
+      response.data.forEach(element => {
+        let tab = element.split(";");
+        Communelist[tab[0]] = tab[1];
+      });
+      setCommunes(Communelist)
+    })
+  }
+  const changehandler = (e) => {
+    setIsFilter(true)
+    let result=[]
+    console.log(resultAnnonces.length)
+    const { name, value } = e.target
+    let id = 0;
+    if (name == "type_bien") {
+        setresultAnnonces(resultAnnonces.filter(annonce => annonce.type_bien == value ))
     }
-  })
- }
- else if(name=="type_ops"){
-  this.state.AllTypeOperation.map((item)=>{
-    if(item.type==value){
-      this.setState({Annonces:[]})
-      id=item.id
-      this.state.resultAnnonces.map((annonce)=>{
-        if(annonce.type_operation==id){
-          this.setState(previousState => ({
-            Annonces: [...previousState.Annonces, annonce]
-        }));
-        }
-      })
-    }
-  })
- }
-    else if (name == "commune") {
-        Object.entries(this.state.Communes).map(([key, val]) => {
-            if (val == value) {
-                this.setState({ Annonces: [] })
-                id = key;
-                this.state.resultAnnonces.map((annonce) => {
-                    if (id == annonce.commune) {
-                        this.setState(previousState => ({
-                            Annonces: [...previousState.Annonces, annonce]
-                        }))  
-                }
-                })
-            }
-        })
-}
-else if(name=="statut"){
-  let status;
-  Statuts.forEach(stat=>{
-    if(stat.Description==value){
-      status=stat.abr
-    }
-})
-this.setState({ Annonces: [] })
-this.state.resultAnnonces.map((annonce) => {
-  if (status == annonce.status) {
-      this.setState(previousState => ({
-          Annonces: [...previousState.Annonces, annonce]
-      }))  
-}
-})
-}
-}
-
-FetchData(facteur){
-if(this.state.resultAnnonces.length>(this.state.limite+facteur*8) && this.state.limite>=0){
-  this.setState({limite:this.state.limite+facteur*8})
-  this.setState({Annonces:[]})
-  let iterator=0;
-  this.state.resultAnnonces.map((item) =>{
-    if(iterator<this.state.limite && iterator>=(this.state.limite-8)){
-      this.setState(previousState => ({
-        Annonces: [...previousState.Annonces, item]
-    }))
-    }
-    iterator++
-  })
-}
-}
-  render() {
+    else if (name == "type_ops") {
+        setresultAnnonces(resultAnnonces.filter(annonce => annonce.type_operation == value ))
+      }
+      else if (name == "commune") {
+        setresultAnnonces(resultAnnonces.filter(annonce => annonce.commune == value ))
+      }
+      else if (name == "statut") {
+        setresultAnnonces(resultAnnonces.filter(annonce => annonce.status == value ))
+      }
+    
+  }
+  const deleteFilters=()=>{
+    $("#type_bien").val(0) 
+    $("#type_ops").val(0) 
+    $("#region").val(0) 
+    $("#commune").val(0) 
+    $("#statut").val(0) 
+    setresultAnnonces(AllAnnonces)
+    setAnnonces(resultAnnonces.slice(0,pagination.itemsCountPerPage))
+    setIsFilter(false)
+  }
     return (
-      <>
-         <div  className="form-group row SelectArea">
-            <select className="form-control col-md-2" name="type_bien" title="type bien" id="type_bien"
-             onChange={this.changehandler}
-            >
-                <option selected="selected" value="" disabled>Type de bien</option>
-                {
-                this.state.AllTypeBien.map((item) =>
-                    <option>{item.type}</option>
-                    )
-                }
-            </select>
-            <select className="form-control col-md-2" name="type_ops" title="Type d'opération" id="type_ops"
-             onChange={this.changehandler}
-            >
-                <option selected="selected" disabled>Type d'opération</option>
-                {
-                this.state.AllTypeOperation.map((item) =>
-                    <option>{item.type}</option>
-                    )
-                }
-            </select>
+        <>
+        <div className="form-group row SelectArea">
+          <select className="form-control col-md-2" name="type_bien" title="type bien" id="type_bien"
+            onChange={changehandler}
+          >
+            <option selected="selected" value="0" disabled>Type de bien</option>
+            {
+                AllTypeBien.map((item) =>
+                <option value={item.id}>{item.type}</option>
+              )
+            }
+          </select>
+          <select className="form-control col-md-2" name="type_ops" title="Type d'opération" id="type_ops"
+            onChange={changehandler}
+          >
+            <option selected="selected" value="0" disabled>Type d'opération</option>
+            {
+              AllTypeOperation.map((item) =>
+                <option value={item.id}>{item.type}</option>
+              )
+            }
+          </select>
 
-            <select className="form-control col-md-2 " name="region" title="Region" id="region"
-               aria-valuemax="" value={this.state.Filtre.region}  onChange={(e)=>this.GetCommunes(e.target.value)}>
-                <option selected disabled>Région</option>
-                {
-                Region.map((item) =>
-                    <option>{item.label}</option>
-                    )
-                }
-            </select>
-            <select className="form-control col-md-3" name="commune" id="commune" title="Commune"
-             onChange={this.changehandler}
+          <select className="form-control col-md-2 " name="region" title="Region" id="region"
+            aria-valuemax="" 
+            onChange={(e) => GetCommunes(e.target.value)}
             >
-                <option selected disabled>Commune</option>
+            <option selected value="0" disabled>Région</option>
+            {
+              Region.map((item) =>
+                <option value={item.id}>{item.label}</option>
+              )
+            }
+          </select>
+          <select className="form-control col-md-3" name="commune" id="commune" title="Province"
+             onChange={changehandler}
+          >
+            <option selected  value="0" disabled>Province</option>
+            {
+              Object.entries(Communes).map(([key, value]) =>
+                <option value={key}>{value}</option>
+              )
+            }
+          </select>
+          <select className="form-control col-md-2 " name="statut" title="Statut" id="statut"
+            aria-valuemax="" 
+            onChange={changehandler}
+            >
+            <option value="0" selected disabled>Statut</option>
+            {
+              Statuts.map((item) =>
+                <option value={item.abr}>{item.Description}</option>
+              )
+            }
+          </select>
+          <button className="col-md-1 btn btn-warning"
+          onClick={()=>deleteFilters()}
+          >
               {
-                 Object.entries(this.state.Communes).map( ([key, value]) => 
-              <option >{value}</option>
-                 )
+                  isfilter?
+                  <i className="fa fa-close"></i>
+                  :
+                  <i className="fa fa-filter"></i>
               }
-            </select>
-            <select className="form-control col-md-3 " name="statut" title="Statut" id="statut"
-               aria-valuemax=""   onChange={this.changehandler}>
-                <option selected disabled>Statut</option>
-                {
-                Statuts.map((item) =>
-                    <option>{item.Description}</option>
-                    )
-                }
-            </select>
+             
+              
+              </button>
         </div>
         <div className="py-5">
           <div className="container">
             <div className="row">
-            {
-                this.state.Annonces.map((item) =>
-                <AnnonceCard className="col-md-3" type_bien={this.getTypeBien(item.type_bien)} type_ops={this.getTypeOperation(item.type_operation)} prix={item.prix} 
-                id_annonce={item.id} type_action={3} status={item.status}/>
-                    )
-                    
-                }
-                
+              {
+                Annonces.map((item) =>
+                  <AnnonceCard className="col-md-3" type_bien={getTypeBien(item.type_bien)} type_ops={getTypeOperation(item.type_operation)} prix={item.prix}
+                    id_annonce={item.id} image={FindPhotos(item.id)} type_action={3} status={item.status} />
+                )
+
+              }
+
             </div>
             <div className="row">
-            <button className="col-md-2 offset-md-7 btn btn-primary" onClick={()=>this.FetchData(-1)}>précédent</button>
-              <button className="col-md-2 offset-md-1 btn btn-primary" onClick={()=>this.FetchData(1)}>suivant </button>
-              
+              <Pagination
+                activePage={pagination.activePage}
+                itemsCountPerPage={pagination.itemsCountPerPage}
+                totalItemsCount={pagination.totalItemsCount}
+                pageRangeDisplayed={5}
+                 onChange={handlePageChange.bind(this)}
+              />
             </div>
           </div>
 
         </div>
       </>
     )
-  }
 }
-export default ConsulterAnnonceAdmin;
+export default ConsulterAnnoncesAdmin;

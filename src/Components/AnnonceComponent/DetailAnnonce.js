@@ -3,7 +3,10 @@ import AnnonceService from '../../services/AnnonceService'
 import AnnonceCard from './AnnonceCard'
 import Carousel from 'react-bootstrap/Carousel'
 import { Redirect } from 'react-router-dom'
-
+import Modal from 'react-modal';
+import ReactMapGL, { Marker,FlyToInterpolator,NavigationControl,GeolocateControl , Popup } from "react-map-gl";
+import Swal from 'sweetalert2';
+import AfficherDemande from './AfficherDemandes';
 // type_action :
 // cette composante sera utiliser dans 3 page a savoir (
 //   consulter vos annonce : type action=1 les actions sont :
@@ -38,12 +41,20 @@ class DetailAnnonce extends Component {
         nom_complet_proprietaire:"",
         telephone:"",
         email:"",
-        status:""
+        status:"",
+        isModalOpen:false,
      }
      ,
+     showdemande:false,
      redirect:false,
-     Images :[]
-     
+     Images :[],
+     viewport:{
+      latitude: 31.7923,
+      longitude: -7.0801,
+      zoom: 6,
+      width: "100vw",
+      height: "100vh",
+     }
  }
     constructor(props){
       console.log(props.type_action)
@@ -55,7 +66,14 @@ class DetailAnnonce extends Component {
                 this.setState({Annonce:result.data,
                     type_bien:props.type_bien,
                     type_operation:props.type_ops,
-                    type_action:props.type_action
+                    type_action:props.type_action,
+                    viewport:{
+                      latitude: result.data.lat,
+                      longitude:result.data.lon,
+                      zoom: 6,
+                      width: "100vw",
+                      height: "100vh",
+                     }
                 })
                 console.log(this.state)
             })
@@ -64,9 +82,17 @@ class DetailAnnonce extends Component {
     }
     Annuler(){
         this.setState({closeDetail:0})
-        return <AnnonceCard className="col-md-3" status={this.state.Annonce.status} type_bien={this.state.type_bien} type_ops={this.state.type_operation} prix={this.state.Annonce.prix} 
-        id_annonce={this.state.Annonce.id} type_action={this.state.type_action}/>
-    }
+        return <AnnonceCard className="col-md-3" 
+        image={this.props.image}
+        status={this.state.Annonce.status} 
+        type_bien={this.state.type_bien}
+         type_ops={this.state.type_operation} 
+         prix={this.state.Annonce.prix} 
+        id_annonce={this.state.Annonce.id} 
+        type_action={this.state.type_action}/>
+    
+      
+        }
     Affecter(){
       AnnonceService.AffectationAnnonceToInterm(localStorage.getItem("id"),this.state.Annonce.id)
     }
@@ -81,8 +107,34 @@ class DetailAnnonce extends Component {
     localStorage.setItem("idannonce",this.state.Annonce.id)
     this.setState({redirect:true})
     }
-    cloturer(){
-      AnnonceService.changeStatutAnnonce(this.state.Annonce.id,"CL")
+    ChangeStatus(){
+     let id_annonce= this.state.Annonce.id
+      Swal.fire({
+        title: "Changer le statut de l'annonce !",
+        input: 'select',
+        inputOptions: {
+          'AI': 'Annonce illégale',
+          'CL': 'Annonce Cloturée',
+        },
+        inputPlaceholder: 'En cours',
+        showCancelButton: true,
+        cancelButtonText:"Annuler",
+        confirmButtonText:'Changer',
+        inputValidator: function (value) {
+          return new Promise(function (resolve, reject) {
+            if (value !== '') {
+              resolve();
+            } else {
+              resolve('selectionner un statut');
+            }
+          });
+        }
+      }).then(function (result) {
+        if (result.value) {
+          AnnonceService.changeStatutAnnonce(id_annonce,result.value)
+        }
+      });
+      // AnnonceService.changeStatutAnnonce(this.state.Annonce.id,"CL")
     }
     GetActions(){
       switch(this.state.type_action){
@@ -90,9 +142,10 @@ class DetailAnnonce extends Component {
           return(
             <div>
             <div className="row">
-              <button className="btn btn-primary col-md-2 offset-md-1" onClick={()=>this.AfficherDemandes()} >Afficher les demmandes</button>
-              <button className="btn btn-success col-md-2 offset-md-1" onClick={()=>this.cloturer()}>cloturer</button>
-              <button className=" btn btn-danger col-md-2 offset-md-1" onClick={()=>this.AnnonceIllegale()} >anoonce illégale</button>
+              <button className="btn btn-primary col-md-2 offset-md-1" onClick={()=>{
+                this.setState({showdemande:true})
+              }} >Afficher les demmandes</button>
+              <button className="btn btn-success col-md-2 offset-md-1" onClick={()=>this.ChangeStatus()}>Chnager le statut</button>
               <button className="btn btn-warning col-md-2 offset-md-1"  onClick={()=>this.Annuler()}>annuler</button>
             </div>
             </div>
@@ -138,15 +191,15 @@ class DetailAnnonce extends Component {
     };
     const ImageTemplate = ({ data }) => <img src={`data:image/jpeg;base64,${data}`} width="100%" height="350px" />
     if(this.state.closeDetail==0){
-        return <AnnonceCard className="col-md-3" type_bien={this.state.type_bien} type_ops={this.state.type_operation} prix={this.state.Annonce.prix} 
-        id_annonce={this.state.Annonce.id}/>
-    }
-    else if(this.state.redirect){
-      return  <Redirect
-      to={{
-      pathname: "/showDemands"
-    }}
-  />
+        return <AnnonceCard className="col-md-3" 
+        image={this.props.image}
+        status={this.state.Annonce.status} 
+        type_bien={this.state.type_bien}
+         type_ops={this.state.type_operation} 
+         prix={this.state.Annonce.prix} 
+        id_annonce={this.state.Annonce.id} 
+        type_action={this.state.type_action}
+        />
     }
     else
     return (
@@ -217,12 +270,15 @@ class DetailAnnonce extends Component {
                   <h5 >
                     <strong>
                     Coordonnée : ({this.state.Annonce.lon},{this.state.Annonce.lat})
+                    <button className="btn btn-primary" style={{marginLeft:"10px"}}
+                    onClick={()=>this.setState({isModalOpen:true})}
+                    >localisation <i className="fa fa-eye"></i></button>
                     </strong>
                   </h5>
                   <p className="text-capitalize font-weight-bold mt-3 mb-0">
                     Quelque informations sur le bien immobilier
                   </p>
-                  <p className="text-muted lead">{this.state.Annonce.description}</p>
+                  <p className="text-muted lead " style={{width:"20px"}} >{this.state.Annonce.description}</p>
                      </div>
                      <div className="col-md-12">
                       
@@ -232,7 +288,57 @@ class DetailAnnonce extends Component {
             {
               this.GetActions()
             }
+             <div>
+            <Modal
+            style={{height:"50px", width: "300px"}}
+               isOpen={this.state.isModalOpen}
+              contentLabel="Example Modal"
+            >
+            <div className='container'>
+              <div className="row"
+              >
+              <ReactMapGL
+                style={{
+                  height:"50"
+                }}
+                {...this.state.viewport}
+                mapboxApiAccessToken="pk.eyJ1IjoibWVka2FmY2hyYWl0IiwiYSI6ImNrazA5bzFqdzBmYWcyeHJyd3gxMzkzNzEifQ.0x8lrv6mP6Keq7a4xvW_pA"
+                mapStyle="mapbox://styles/mapbox/streets-v11"
+                onViewportChange={viewport => {
+                this.setState({viewport:viewport});
+                }}
             
+            >
+              <button className="btn btn-warning"
+                  onClick={()=>this.setState({isModalOpen:false})}
+                  >Fermer</button>
+                <Marker
+                latitude={this.state.Annonce.lat}
+                longitude={this.state.Annonce.lon}
+                >
+                  <img src="./assets/Icons/iconSelected.png" width="50px" height="50px"/>
+                </Marker>
+             </ReactMapGL>
+              </div>
+            </div>
+            </Modal>
+            {/* show demandes  */}
+            <Modal
+            style={{height:"50px", width: "300px"}}
+               isOpen={this.state.showdemande}
+              contentLabel="Example Modal"
+            >
+            <div className='container'>
+              <div className="row"
+              >
+                <AfficherDemande  id_annonce={this.state.Annonce.id}/>
+              </div>
+              <div className="row">
+              <button className=" offset-md-4 col-md-3 btn btn-success" onClick={()=>this.setState({showdemande:false})}>Retour </button>
+              </div>
+            </div>
+            </Modal>
+          </div>
         </div>
     );
 }

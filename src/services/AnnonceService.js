@@ -102,6 +102,7 @@ class AnnonceService{
         return http.get("Annonce/GetAcceptsAnnonces")
     }
     changeStatutAnnonce(id,status){
+        console.log(id+"++"+status)
         const data={
             "id":id,
             "status":status

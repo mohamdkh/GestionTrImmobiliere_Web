@@ -27,7 +27,7 @@ function Navbar () {
   }
     return (
       <>
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark" style={{marginBottom:33}}>
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark" >
           <a className="navbar-brand" href="#">
             <img src={logo} width="140" height="55" alt="" />
           </a>
@@ -51,6 +51,21 @@ function Navbar () {
                 <a className="nav-link" style={{ fontSize: '18px' }} ><i className="fa fa-info-circle"></i> Contacter-nous</a>
                 </Link>
               </li>
+              <li className="nav-item">
+               <Link to="/About">
+                <a className="nav-link" style={{ fontSize: '18px' }} ><i className="fa fa-info-circle"></i> Qui Somme nous?</a>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <img src="./assets/logoName.png" width="360px" height="55"
+                style={{
+                  // backgroundColor: "aliceblue"
+                  boxShadow: "0 0 60px -16px white",
+                  marginLeft:"50px"
+                }}
+                />
+              </li>
+
             </ul>
             {
                roleLink=='intermediaire'&&
@@ -64,8 +79,6 @@ function Navbar () {
               </DropdownToggle>
               <DropdownMenu>
               <DropdownItem><Link to="/ProfilIntermmediaire">Mon Profil</Link></DropdownItem>
-                <DropdownItem><Link to="/AnnonceInterm">Mes Annonces</Link></DropdownItem>
-                <DropdownItem><Link to="/consultationInterm">Consulter les annonces</Link></DropdownItem>
                <DropdownItem divider/>
                 <DropdownItem onClick={()=>LogOut()}> Déconnexion</DropdownItem>
               </DropdownMenu>
@@ -84,10 +97,7 @@ function Navbar () {
                 Espace Gestionnaire
               </DropdownToggle>
               <DropdownMenu>
-              <DropdownItem><Link to="/gestionAdhesion">Gérer les adhésions</Link></DropdownItem>
-                <DropdownItem><Link to="/gestionIntermmediaire">Gérer les intermmédiaire</Link></DropdownItem>
-                <DropdownItem><Link to="/ConsultationAdmin">Consulter les annonces</Link></DropdownItem>
-                <DropdownItem><Link to="/Messagerie">Boîte de réception</Link></DropdownItem>
+                <DropdownItem><Link to="/admin">Boîte de réception</Link></DropdownItem>
                <DropdownItem divider/>
                 <DropdownItem onClick={()=>LogOut()}> Déconnexion</DropdownItem>
               </DropdownMenu>

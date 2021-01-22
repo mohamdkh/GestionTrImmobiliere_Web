@@ -41,7 +41,7 @@ class Commune extends Component {
 					Swal.fire({
 						title: 'Confirmation !',
 						html: `
-						  Communes selectionnées:
+						Provinces selectionnées:
 						  <pre><code>${answers}</code></pre>
 						`,
 						confirmButtonText: 'Confirmer!',
@@ -56,7 +56,7 @@ class Commune extends Component {
 							});
 							Swal.fire(
 								'Exécution',
-								'Communes sont affectée à votre profil avec succès.',
+								'Les Provinces sont affectée à votre profil avec succès.',
 								'success'
 							)
 						}

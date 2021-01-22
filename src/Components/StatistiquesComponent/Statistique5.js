@@ -1,6 +1,6 @@
 import { data } from "jquery";
 import React, { Component } from "react";
-import {Bar, Line, Pie} from 'react-chartjs-2';
+import {Bar, Line, Pie,Polar} from 'react-chartjs-2';
 import StatistiqueService from './../../services/StatistiqueService'
 import AnnonceService from '../../services/AnnonceService'
 class Statistique5 extends Component {
@@ -13,9 +13,10 @@ class Statistique5 extends Component {
     type_ops:"",
     indexToggle:"typebien"
   }
-  constructor(){
-    super()
-    this.Filtrer("typebien")
+  constructor(props){
+    super(props)
+    console.log(props.cat)
+    this.Filtrer(props.cat)
   }
   getTypes(categorie){
     let Types=[]
@@ -81,7 +82,7 @@ class Statistique5 extends Component {
         </div>
         <div className="row chart">
 
-           <Pie
+           <Polar
           data={this.state.chartData}
         />
         </div>

@@ -82,7 +82,7 @@ class Register extends Component {
     Submit() {
         var drapo=0;
         if(this.state.confirmPassword!=this.state.password){
-            //console.log("yeaah")
+            console.log("yeaah")
         }
         else if(localStorage.getItem("commune1")==null || localStorage.getItem("commune2")==null || localStorage.getItem("commune3")==null ){
 
@@ -142,7 +142,7 @@ class Register extends Component {
                                                 <input type="password" name="password" value={password} placeholder="Mot de passe" onChange={this.changehandler}/>
                                                 <input type="password" name="confirmPassword"  placeholder="Confirmer mot de passe" onChange={this.changehandler}/>
                                             </div>
-                                            <input type="button" name="next" className="next action-button" value="Next"
+                                            <input type="button" name="next" className="next action-button" value="Suivant"
                                                 onClick={() => this.OnClickNext('infosPersonnelle')} style={{ marginRight: '10px' }}/>
                                         </fieldset>
                                         <fieldset id="selectCommune">
@@ -157,11 +157,11 @@ class Register extends Component {
                                                 </div>
                                                 <Commune></Commune>
                                             </div>
-                                            <input type="button" name="next" className="next action-button" value="Next" style={{ marginRight: '10px' }}
+                                            <input type="button" name="next" className="next action-button" value="Suivant" style={{ marginRight: '10px' }}
                                                 onClick={() => this.OnClickNext('selectCommune')} />
                                             <input
                                                 type="button" name="previous" className="previous action-button-previous"
-                                                value="Previous" onClick={() => this.OnClickPrevious('selectCommune')} />
+                                                value="Précedent" onClick={() => this.OnClickPrevious('selectCommune')} />
                                         </fieldset>
                                         <fieldset id="importJustif">
                                             <div className="form-card">
@@ -176,7 +176,7 @@ class Register extends Component {
                                                 <label className="fieldlabels">Importer votre pièce justificative:</label>
                                                 <input type="file" name="pic" accept="image/*" id="fileuploaded" onChange={this.UploadFile}/>
                                             </div>
-                                            <input type="button" name="next" className="next action-button" value="Submit" onClick={() => this.Submit()} style={{ marginRight: '10px' }} />
+                                            <input type="button" name="next" className="next action-button" value="s'inscrire" onClick={() => this.Submit()} style={{ marginRight: '10px' }} />
                                             <input
                                                 type="button" name="previous" className="previous action-button-previous"
                                                 value="Previous" onClick={() => this.OnClickPrevious('importJustif')} />
